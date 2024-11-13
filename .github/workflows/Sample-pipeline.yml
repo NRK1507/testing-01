@@ -1,0 +1,82 @@
+name: Sample Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allows manual trigger for stage control
+
+jobs:
+  # Gate Stage
+  gate_js_test:
+    name: JavaScript Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run JavaScript Tests
+        run: |
+          echo "Running JavaScript tests..."
+
+  gate_python_test:
+    name: Python Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Python Tests
+        run: |
+          echo "Running Python tests..."
+
+  # Build Stage
+  build_js:
+    name: JavaScript Build
+    runs-on: ubuntu-latest
+    needs: [gate_js_test, gate_python_test]  # Run after gate stage completes
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build JavaScript
+        run: |
+          echo "Building JavaScript application..."
+
+  build_push_artifact:
+    name: Build & Push Artifact
+    runs-on: ubuntu-latest
+    needs: [gate_js_test, gate_python_test]  # Run after gate stage completes
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Artifact
+        run: |
+          echo "Building artifact..."
+
+      - name: Push Artifact
+        run: |
+          echo "Pushing artifact..."
+
+  # Stage Stage with Manual Control
+  stage:
+    name: Stage Environment
+    runs-on: ubuntu-latest
+    needs: [build_js, build_push_artifact]  # Only run after gate and build stages
+    if: ${{ github.event_name == 'workflow_dispatch' }}  # Manual trigger control
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Production Python Test
+        run: |
+          echo "Running production-level Python tests..."
+
+      - name: Remove Deployment
+        run: |
+          echo "Removing previous deployment..."
+
+      - name: Setup Stage Environment
+        run: |
+          echo "Setting up stage environment..."
