@@ -4,7 +4,25 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Allows manual trigger for stage control
+  workflow_dispatch:  # Allows manual trigger with inputs
+
+# Define inputs for manual control during the workflow_dispatch
+inputs:
+  stage_python_test:
+    description: 'Run Production Python Test'
+    required: false
+    default: 'false'
+    type: boolean
+  remove_deployment:
+    description: 'Run Remove Deployment'
+    required: false
+    default: 'false'
+    type: boolean
+  setup_stage_environment:
+    description: 'Run Setup Stage Environment'
+    required: false
+    default: 'false'
+    type: boolean
 
 jobs:
   # Gate Stage
