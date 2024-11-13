@@ -5,24 +5,22 @@ on:
     branches:
       - main
   workflow_dispatch:  # Allows manual trigger with inputs
-
-# Define inputs for manual control during the workflow_dispatch
-inputs:
-  stage_python_test:
-    description: 'Run Production Python Test'
-    required: false
-    default: 'false'
-    type: boolean
-  remove_deployment:
-    description: 'Run Remove Deployment'
-    required: false
-    default: 'false'
-    type: boolean
-  setup_stage_environment:
-    description: 'Run Setup Stage Environment'
-    required: false
-    default: 'false'
-    type: boolean
+    inputs:
+      stage_python_test:
+        description: 'Run Production Python Test'
+        required: false
+        default: false  # Use boolean true/false instead of string
+        type: boolean
+      remove_deployment:
+        description: 'Run Remove Deployment'
+        required: false
+        default: false  # Use boolean true/false instead of string
+        type: boolean
+      setup_stage_environment:
+        description: 'Run Setup Stage Environment'
+        required: false
+        default: false  # Use boolean true/false instead of string
+        type: boolean
 
 jobs:
   # Gate Stage
@@ -82,7 +80,7 @@ jobs:
     name: Production Python Test
     runs-on: ubuntu-latest
     needs: [build_js, build_push_artifact]  # Only run after gate and build stages
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.stage_python_test == 'true' }}  # Manual trigger control
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.stage_python_test == true }}  # Manual trigger control
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -95,7 +93,7 @@ jobs:
     name: Remove Deployment
     runs-on: ubuntu-latest
     needs: [build_js, build_push_artifact]  # Only run after gate and build stages
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.remove_deployment == 'true' }}  # Manual trigger control
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.remove_deployment == true }}  # Manual trigger control
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -108,7 +106,7 @@ jobs:
     name: Setup Stage Environment
     runs-on: ubuntu-latest
     needs: [build_js, build_push_artifact]  # Only run after gate and build stages
-    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.setup_stage_environment == 'true' }}  # Manual trigger control
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.setup_stage_environment == true }}  # Manual trigger control
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
