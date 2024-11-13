@@ -59,23 +59,41 @@ jobs:
         run: |
           echo "Pushing artifact..."
 
-  # Stage Stage with Manual Control
-  stage:
-    name: Stage Environment
+  # Stage Environment Jobs with Manual Control
+  stage_python_test:
+    name: Production Python Test
     runs-on: ubuntu-latest
     needs: [build_js, build_push_artifact]  # Only run after gate and build stages
-    if: ${{ github.event_name == 'workflow_dispatch' }}  # Manual trigger control
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.stage_python_test == 'true' }}  # Manual trigger control
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Production Python Test
+      - name: Run Production Python Tests
         run: |
           echo "Running production-level Python tests..."
+
+  remove_deployment:
+    name: Remove Deployment
+    runs-on: ubuntu-latest
+    needs: [build_js, build_push_artifact]  # Only run after gate and build stages
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.remove_deployment == 'true' }}  # Manual trigger control
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Remove Deployment
         run: |
           echo "Removing previous deployment..."
+
+  setup_stage_environment:
+    name: Setup Stage Environment
+    runs-on: ubuntu-latest
+    needs: [build_js, build_push_artifact]  # Only run after gate and build stages
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.setup_stage_environment == 'true' }}  # Manual trigger control
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Setup Stage Environment
         run: |
